@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Notifications</title>
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@5.0.7/dist/browser/signalr.min.js"></script>
+</head>
+<body>
+    <h1>Real-time Notifications</h1>
+    <ul id="notifications"></ul>
+
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7133/notificationHub")
+            .build();
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        connection.on("ReceiveNotification", (post) => {
+            const notifications = document.getElementById("notifications");
+            const li = document.createElement("li");
+            li.textContent = `New post: ${post.title}`;
+            notifications.appendChild(li);
+        });
+    </script>
+</body>
+</html>
