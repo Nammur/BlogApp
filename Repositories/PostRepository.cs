@@ -21,7 +21,7 @@ namespace BlogApp.Repositories
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
-            return await _context.Posts.Include(p => p.User).ToListAsync();
+            return await _context.Posts.ToListAsync();
         }
 
         public async Task AddPostAsync(Post post)

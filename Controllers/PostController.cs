@@ -1,6 +1,7 @@
 ﻿using BlogApp.Models.Auth;
 using BlogApp.Models.Post;
 using BlogApp.Services.Interfaces;
+using BlogApp.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -12,10 +13,12 @@ namespace BlogApp.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IValidationService _validationService;
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService, IValidationService validationService)
         {
             _postService = postService;
+            _validationService = validationService;
         }
 
         [HttpGet]
@@ -37,7 +40,11 @@ namespace BlogApp.Controllers
         {
             try
             {
-                var post = await _postService.CreatePostAsync(request.UserId, request.Title, request.Content);
+                var tokenJwt = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var userId = JwtTokenReader.ExtractUserIdFromToken(tokenJwt);
+
+                var post = await _postService.CreatePostAsync(userId, request);
+
                 return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, post);
             }
             catch (Exception ex)
@@ -46,17 +53,24 @@ namespace BlogApp.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> EditPost(int id, [FromBody] EditPostRequest request)
+        [HttpPut]
+        public async Task<IActionResult> EditPost([FromBody] EditPostRequest request)
         {
             try
             {
-                var post = await _postService.EditPostAsync(id, request.Title, request.Content);
+                var tokenJwt = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+                var post = await _postService.EditPostAsync(request);
+
                 if (post == null)
                 {
                     return NotFound();
                 }
-                return Ok(post);
+
+                if (!_validationService.ValidarUsuario(tokenJwt, post.UserId))
+                    return Unauthorized();
+
+            return Ok(post);
             }
             catch (Exception ex)
             {
@@ -69,6 +83,12 @@ namespace BlogApp.Controllers
         {
             try
             {
+                var tokenJwt = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var post = await _postService.GetPostByIdAsync(id);
+
+                if (!_validationService.ValidarUsuario(tokenJwt, post.UserId))
+                    return Unauthorized();
+
                 await _postService.DeletePostAsync(id);
                 return NoContent();
             }

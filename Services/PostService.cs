@@ -1,4 +1,5 @@
 ﻿using BlogApp.Entities;
+using BlogApp.Models.Post;
 using BlogApp.Services.Interfaces;
 
 namespace BlogApp.Services
@@ -14,21 +15,21 @@ namespace BlogApp.Services
             _notificationService = notificationService;
         }
 
-        public async Task<Post> CreatePostAsync(int userId, string title, string content)
+        public async Task<Post> CreatePostAsync(int userId, CreatePostRequest request)
         {
-            var post = new Post { Title = title, Content = content, CreatedAt = DateTime.UtcNow, UserId = userId };
+            var post = new Post {Title = request.Title, Content = request.Content, CreatedAt = DateTime.UtcNow, UserId = userId };
             await _postRepository.AddPostAsync(post);
             await _notificationService.NotifyNewPostAsync(post);
             return post;
         }
 
-        public async Task<Post> EditPostAsync(int postId, string title, string content)
+        public async Task<Post> EditPostAsync(EditPostRequest request)
         {
-            var post = await _postRepository.GetPostByIdAsync(postId);
+            var post = await _postRepository.GetPostByIdAsync(request.idPost);
             if (post != null)
             {
-                post.Title = title;
-                post.Content = content;
+                post.Title = request.Title;
+                post.Content = request.Content;
                 await _postRepository.UpdatePostAsync(post);
             }
             return post;
@@ -42,6 +43,10 @@ namespace BlogApp.Services
         public async Task<IEnumerable<Post>> GetPostsAsync()
         {
             return await _postRepository.GetAllPostsAsync();
+        }
+
+        public async Task<Post> GetPostByIdAsync(int id) { 
+            return await _postRepository.GetPostByIdAsync(id);
         }
     }
 }
