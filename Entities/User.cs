@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public string Username { get; set; }
-        public string PasswordHash { get; set; }  // Passwords should be hashed
+        public string PasswordHash { get; set; } 
     }
 }

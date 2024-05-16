@@ -8,7 +8,6 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adicionar serviços ao contêiner
 builder.Services.AddDbContext<BlogContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddEndpointsApiExplorer();
