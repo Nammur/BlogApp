@@ -45,6 +45,11 @@ namespace BlogApp.Services
             return await _postRepository.GetAllPostsAsync();
         }
 
+        public async Task<IEnumerable<Post>> GetPostsUserAsync(int idUser)
+        {
+            return await _postRepository.GetPostsUserAsync(idUser);
+        }
+
         public async Task<Post> GetPostByIdAsync(int id) { 
             return await _postRepository.GetPostByIdAsync(id);
         }

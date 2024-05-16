@@ -3,6 +3,7 @@ using BlogApp.Models.Post;
 using BlogApp.Services.Interfaces;
 using BlogApp.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Threading.Tasks;
 
@@ -32,6 +33,23 @@ namespace BlogApp.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erro ao buscar as postagens: {ex}");
+            }
+        }
+
+        [HttpGet("posts-user")]
+        public async Task<IActionResult> GetPostsUser()
+        {
+            try
+            {
+                var tokenJwt = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var userId = JwtTokenReader.ExtractUserIdFromToken(tokenJwt);
+
+                var posts = await _postService.GetPostsUserAsync(userId);
+                return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao buscar as postagens do usuário: {ex}");
             }
         }
 

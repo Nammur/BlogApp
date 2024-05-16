@@ -24,6 +24,11 @@ namespace BlogApp.Repositories
             return await _context.Posts.ToListAsync();
         }
 
+        public async Task<IEnumerable<Post>> GetPostsUserAsync(int iduser)
+        {
+            return await _context.Posts.Where(p => p.UserId == iduser).ToListAsync();
+        }
+
         public async Task AddPostAsync(Post post)
         {
             await _context.Posts.AddAsync(post);
