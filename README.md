@@ -48,7 +48,7 @@
   ~~~bash
   dotnet run
   ~~~
-###Frontend Setup
+### Frontend Setup
 
 1. **Serve the HTML file:**
 - Use a live server extension in your IDE (e.g., Live Server in VS Code) to serve the Index.html file located in the Testes directory.
